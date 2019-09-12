@@ -1,5 +1,5 @@
 
-var base_url = 'http://dev.com:8000';
+var base_url = 'http://parlarispa.com/';
 var episodio_api_url = '/api/v1/podcasts/episodio/';
 
 function get_episodio(uid) {
