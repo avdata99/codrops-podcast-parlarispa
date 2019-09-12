@@ -1,5 +1,5 @@
 
-var base_url = 'http://parlarispa.com';
+var base_url = 'https://parlarispa.com';
 var podcast_api_url = '/api/v1/podcasts/podcast/16f5edfd-dcf5-4cfd-9b40-c90f0a6f6d47/';
 
 function get_data() {
