@@ -1,3 +1,3 @@
 # Template de ejemplo para Parlarispa
 
-Basado en [Dropcast](dropcast.html).  
+Basado en [Dropcast](dropcast.md).  
