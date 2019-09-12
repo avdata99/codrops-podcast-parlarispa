@@ -23,6 +23,12 @@ function load_page(data) {
     $("#podcast_name").html(data.podcast.nombre);
     $("#epi_audio").attr('src', base_url + data.audio_url);
     
+    document.getElementById('epi_master_audio').load();
+    // document.getElementById('epi_master_audio').play();
+    // document.getElementById('epi_audio').play();
+    // $("#epi_audio").play();
+    // $("#epi_master_audio").play();
+    
 }
 
 $(function() {
