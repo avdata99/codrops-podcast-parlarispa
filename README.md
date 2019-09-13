@@ -26,6 +26,6 @@ Tickets:
  - Adaptar el template (o proponer otro) para que funcione perfecto en mobile. Hoy tiene algunos detalles a corregir.
  - URL únicas para cada episodio/recurso interno. Al moverse el usuario la URL deberá cambiar y esta deberá ser válida para volver al recurso.
  - Definir una forma de mostrar los links a otras plataformas de podcasts (ya está en el API pero no en la web).
- - Activar el boton _episodio siguiente_.  
+ - Permitir navegar entre los episodios (sin que se corte el audio) simplemente arrastrando para derecha e izquierda (anterior/siguiente) 
 
 
