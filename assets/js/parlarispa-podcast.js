@@ -10,7 +10,34 @@ const CACHE_KEY_EPISODES = "pc_data";
 $(document).ready(function() {
     // Obtenemos el listado de podcasts
     getPodcastList();
+
+    initAudioPlayer();
 });
+
+function initAudioPlayer() {
+    $("#jquery_jplayer_1").jPlayer({
+        ready: function () {
+            $(this).jPlayer("setMedia", {
+            title: "Bubble",
+            m4a: "http://www.jplayer.org/audio/m4a/Miaow-07-Bubble.m4a",
+            oga: "http://www.jplayer.org/audio/ogg/Miaow-07-Bubble.ogg"
+            });
+        },
+        cssSelectorAncestor: "#jp_container_1",
+        swfPath: "/js", // TODO: cambiar directorio
+        supplied: "m4a, oga",
+        useStateClassSkin: true,
+        autoBlur: false,
+        smoothPlayBar: true,
+        keyEnabled: true,
+        remainingDuration: true,
+        toggleDuration: true,
+        size: {
+            width: "100% !important",
+            height: "auto"
+        }
+    });
+}
 
 /**
  * Obtiene el listado de podcasts
