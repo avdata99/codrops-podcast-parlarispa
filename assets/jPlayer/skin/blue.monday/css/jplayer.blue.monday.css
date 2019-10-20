@@ -33,8 +33,9 @@
   font-family: Verdana, Arial, sans-serif;
   line-height: 1.6;
   color: #666;
-  border: 1px solid #009be3;
-  background-color: #eee; }
+  /*border: 1px solid #009be3;*/
+  background-color: #eee; 
+}
 
 .jp-audio {
   width: 420px; }

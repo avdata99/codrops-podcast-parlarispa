@@ -5,37 +5,123 @@ var podcast_api_url = '/api/v1/podcasts/podcast/aa2b715c-73aa-412a-9e04-100f6088
 /** Corresponde a la data completa recibida desde el API */
 var _podcastData = null;
 
+var _audioPlayer = null;
+
+var _mainContainer = null;
+
 const CACHE_KEY_EPISODES = "pc_data";
 
 $(document).ready(function() {
-    // Obtenemos el listado de podcasts
-    getPodcastList();
+    _mainContainer = $("#main_container");
 
-    initAudioPlayer();
+    // Obtenemos el listado de podcasts
+    getPodcastList().then((result) => {
+        if (result == true) {
+            loadMainPage();
+
+            initAudioPlayer();
+
+            let lastEpisode = getLastEpisode();
+
+            setPlayerMedia(setMediaObject(lastEpisode));
+        }
+    });
+
+    registerPageEvents();
 });
 
+function loadEpisodesList() {
+    _mainContainer.html("");
+
+    let tpl_episode = "";
+    let episodeList = _podcastData.episodios;
+    let htmlCode = "<div class='container'><div class='row'>";
+
+    // Recorremos la lista de episodios
+    for (let i = 0; i < episodeList.length; i++) {
+        let curEpisode = episodeList[i];
+
+        tpl_episode = `
+            <div class='col-sm-6'>
+                <article class='card mb-3'>
+                    <img class='img-fluid' src='{{ episode_image_url }}' />
+                    <div class='card-body'>
+                        <h5 class='card-title'>{{ episode_title }}</h5>
+                        <p class='card-text'>{{ episode_description }}</p>
+                    </div>
+                </article>
+            </div>`;
+
+        let values = {
+            'episode_number': i + 1, 
+            'episode_image_url': curEpisode.imagen, 
+            'episode_title': curEpisode.nombre, 
+            'episode_description': curEpisode.descripcion,
+            'episode_uid': curEpisode.uid
+        };
+
+        for (var j in values) {
+            // Utilizamos una Regular Expression de manera tal que los placeholders
+            // puedan ser reemplazados a lo largo de todo el texto y no solamente la primera vez que se encuentre dicho valor
+            let re = new RegExp("{{ " + j + " }}", "ig");
+            tpl_episode = tpl_episode.replace(re, values[j]);
+        }
+
+        htmlCode += tpl_episode;
+    }
+
+    htmlCode += "</div></div>"
+
+    _mainContainer.append(htmlCode);
+}
+
+function registerPageEvents() {
+    $("a").click(function(event) {
+        event.preventDefault();
+
+        let curID = $(this).attr("id");
+
+        if (curID == "link_epiList") {
+            loadEpisodesList();
+        }
+        //else openLink($(this));
+        else loadMainPage();
+    })
+}
+
+function openLink(linkElement) {
+    let linkDest = linkElement.attr("href");
+
+    _mainContainer.load(linkDest);
+}
+
+function setMediaObject(episodeData) {
+    return {
+        mp3File: episodeData.audio_url,
+        title: episodeData.nombre
+    }
+}
+
+function setPlayerMedia(mediaData) {
+    _audioPlayer.jPlayer("setMedia", {
+        mp3: mediaData.mp3File,
+        title: mediaData.title
+    });
+}
+
 function initAudioPlayer() {
-    $("#jquery_jplayer_1").jPlayer({
-        ready: function () {
-            $(this).jPlayer("setMedia", {
-            title: "Bubble",
-            m4a: "http://www.jplayer.org/audio/m4a/Miaow-07-Bubble.m4a",
-            oga: "http://www.jplayer.org/audio/ogg/Miaow-07-Bubble.ogg"
-            });
-        },
+    _audioPlayer = $("#jquery_jplayer_1");
+    
+    _audioPlayer.jPlayer({
         cssSelectorAncestor: "#jp_container_1",
         swfPath: "/js", // TODO: cambiar directorio
-        supplied: "m4a, oga",
+        supplied: "mp3",
         useStateClassSkin: true,
         autoBlur: false,
         smoothPlayBar: true,
         keyEnabled: true,
         remainingDuration: true,
-        toggleDuration: true,
-        size: {
-            width: "100% !important",
-            height: "auto"
-        }
+        toggleDuration: true
     });
 }
 
@@ -43,44 +129,48 @@ function initAudioPlayer() {
  * Obtiene el listado de podcasts
  */
 function getPodcastList() {
-    // Verificamos si el listado de episodios ya fue obtenido previamente.
-    let dataFromStorage = getDataFromStorage();
+    return new Promise((resolve, reject) => {
+        // Verificamos si el listado de episodios ya fue obtenido previamente.
+        let dataFromStorage = getDataFromStorage();
 
-    if (dataFromStorage) {
-        _podcastData = dataFromStorage;
-        
-        // Iniciamos la carga de la página
-        load_page();
-    }
-    else {
-        // Solo obtenemos datos desde el API si no hay datos en storage
-        // o si los mismos han expirado.
-        let url = base_url + podcast_api_url;
+        if (dataFromStorage) {
+            _podcastData = dataFromStorage;
+            
+            resolve(true);
+        }
+        else {
+            // Solo obtenemos datos desde el API si no hay datos en storage
+            // o si los mismos han expirado.
+            let url = base_url + podcast_api_url;
 
-        $.get(url, function() {
-            console.log("success");
-        }).done(function(data) {
-            // Almacenamos la data recibida en caché
-            saveDataToStorage(data);
+            $.get(url, function() {
+                console.log("success");
+            }).done(function(data) {
+                // Almacenamos la data recibida en caché
+                saveDataToStorage(data);
 
-            // Establecemos la data en una variable global.
-            _podcastData = data;
-           
-            // Iniciamos la carga de la página
-            load_page();
-        }).fail(function(e, msg) {
-            alert('Error leyendo podcast: ' + msg);
-        }).always(function() {
-            console.log('always');
-        });
-    }
+                // Establecemos la data en una variable global.
+                _podcastData = data;
+
+                resolve(true);
+            }).fail(function(e, msg) {
+                alert('Error leyendo podcast: ' + msg);
+
+                resolve(false);
+            }).always(function() {
+                console.log('always');
+            });
+        }
+    });
 }
 
 /**
  * Inicializa la carga de la página.
  */
-function load_page() {
+function loadMainPage() {
     let lastEpisode = getLastEpisode();
+
+    _mainContainer.html("");
 
     $("#psp_main_title").html(_podcastData.nombre);
     $("#psp_main_subtitle").html(_podcastData.descripcion);
@@ -140,7 +230,7 @@ function load_page() {
         $article = $article.replace(re, values[i]);
     }
     
-    $("#episodes_section").append($article);
+    _mainContainer.append($article);
 }
 
 /**
