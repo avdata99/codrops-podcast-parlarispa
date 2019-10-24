@@ -1,21 +1,21 @@
-
 var base_url = 'https://parlarispa.com';
 var podcast_api_url = '/api/v1/podcasts/podcast/aa2b715c-73aa-412a-9e04-100f60881ffa/';
 
 /** Corresponde a la data completa recibida desde el API */
 var _podcastData = null;
 
-var _audioPlayer = null;
-
 var _mainContainer = null;
-
-const CACHE_KEY_EPISODES = "pc_data";
 
 $(document).ready(function() {
     _mainContainer = $("#main_container");
 
-    // Obtenemos el listado de podcasts
-    getPodcastList().then((result) => {
+    init();
+});
+
+/** Comienza todo el proceso de inicialización del sitio. */
+function init() {
+    // Obtenemos toda la información desde el API
+    getPodcastData().then((result) => {
         if (result == true) {
             loadMainPage();
 
@@ -23,12 +23,12 @@ $(document).ready(function() {
 
             let lastEpisode = getLastEpisode();
 
-            setPlayerMedia(setMediaObject(lastEpisode));
+            setPlayerMedia(createMediaObject(lastEpisode));
         }
     });
 
     registerPageEvents();
-});
+}
 
 function loadEpisodesList() {
     _mainContainer.html("");
@@ -75,17 +75,42 @@ function loadEpisodesList() {
     _mainContainer.append(htmlCode);
 }
 
+/**
+ * Enlaza eventos a elementos HTML a lo largo del documento.
+ * <p>
+ * Nota: Todos los eventos, como por ejemplo clicks, mouseover, etc. deberían registrarse acá
+ * para mantener el orden.
+ * </p>
+ */
 function registerPageEvents() {
-    $("a").click(function(event) {
+    
+    // Eventos de click sobre todas las etiquetas "<a>"
+    $(document).on("click", "a", function(event) {
         event.preventDefault();
+        event.stopPropagation();
 
-        let curID = $(this).attr("id");
+        let curID = $(this).attr("data-id");
 
-        if (curID == "link_epiList") {
+        switch (curID.toLowerCase())
+        {
+            case "link_epilist":    // lista de episodios
+                loadEpisodesList();
+                break;
+
+            case "link_episode":    // detalle de episodio
+
+                break;
+
+            default:
+                loadMainPage();
+                break;
+        }
+
+        /*if (curID == "link_epiList") {
             loadEpisodesList();
         }
         //else openLink($(this));
-        else loadMainPage();
+        else loadMainPage();*/
     })
 }
 
@@ -95,41 +120,11 @@ function openLink(linkElement) {
     _mainContainer.load(linkDest);
 }
 
-function setMediaObject(episodeData) {
-    return {
-        mp3File: episodeData.audio_url,
-        title: episodeData.nombre
-    }
-}
-
-function setPlayerMedia(mediaData) {
-    _audioPlayer.jPlayer("setMedia", {
-        mp3: mediaData.mp3File,
-        title: mediaData.title
-    });
-}
-
-function initAudioPlayer() {
-    _audioPlayer = $("#jquery_jplayer_1");
-    
-    _audioPlayer.jPlayer({
-        cssSelectorAncestor: "#jp_container_1",
-        swfPath: "/js", // TODO: cambiar directorio
-        supplied: "mp3",
-        useStateClassSkin: true,
-        autoBlur: false,
-        smoothPlayBar: true,
-        keyEnabled: true,
-        remainingDuration: true,
-        toggleDuration: true
-    });
-}
-
 /**
- * Obtiene el listado de podcasts
+ * Obtiene toda la información del podcast desde el API.
  */
-function getPodcastList() {
-    return new Promise((resolve, reject) => {
+function getPodcastData() {
+    return new Promise((resolve) => {
         // Verificamos si el listado de episodios ya fue obtenido previamente.
         let dataFromStorage = getDataFromStorage();
 
@@ -153,7 +148,7 @@ function getPodcastList() {
                 _podcastData = data;
 
                 resolve(true);
-            }).fail(function(e, msg) {
+            }).fail(function(msg) {
                 alert('Error leyendo podcast: ' + msg);
 
                 resolve(false);
@@ -172,8 +167,8 @@ function loadMainPage() {
 
     _mainContainer.html("");
 
-    $("#psp_main_title").html(_podcastData.nombre);
-    $("#psp_main_subtitle").html(_podcastData.descripcion);
+    //$("#psp_main_title").html(_podcastData.nombre);
+    //$("#psp_main_subtitle").html(_podcastData.descripcion);
 
     /*let tpl_episode = `<article class="episode">
                 <h2 class="episode__number">{{ episode_number }}</h2>
@@ -189,9 +184,9 @@ function loadMainPage() {
     let tpl_episode = `
         <div class='container'>
             <article class='card mb-3'>
-                <img class='img-fluid' src='{{ episode_image_url }}' />
+                <a class='img-fluid' data-id='link_episode' href='episodio/{{ episode_slug }}'><img class='img-fluid' src='{{ episode_image_url }}' /></a>
                 <div class='card-body'>
-                    <h5 class='card-title'>{{ episode_title }}</h5>
+                    <h5 class='card-title'><a href='episodio/{{ episode_slug }}' data-id='link_episode'>{{ episode_title }}</a></h5>
                     <p class='card-text'>{{ episode_description }}</p>
                 </div>
             </article>
@@ -218,7 +213,8 @@ function loadMainPage() {
         'episode_image_url': lastEpisode.imagen, 
         'episode_title': lastEpisode.nombre, 
         'episode_description': lastEpisode.descripcion,
-        'episode_uid': lastEpisode.uid
+        'episode_uid': lastEpisode.uid,
+        'episode_slug': lastEpisode.slug
     };
     
     $article = tpl_episode;
@@ -238,62 +234,4 @@ function loadMainPage() {
  */
 function getLastEpisode() {
     return _podcastData.episodios[0];
-}
-
-/** Devuelve la cantidad de milisegundos equivalentes a 24 horas. */
-function setCacheTTL() {
-    let hour = 1000*60*60;
-    let day = hour*24;
-
-    return day;
-}
-
-/**
- * Establece el tiempo de expiración para la data en storage.
- */
-function setExpirationTime() {
-    let curTTL = this.setCacheTTL();
-    return new Date().getTime() + curTTL;
-}
-
-/**
- * Verifica si el TTL de la data en storage ha expirado.
- * @param data Datos obtenidos desde storage
- */
-function isDataOutdated(data) {
-    let dataExpTime = parseInt(data.ExpDate, 10);
-    let curTime = new Date().getTime();
-
-    if (curTime >= dataExpTime) return true;
-    else return false;
-}
-
-/**
- * Almacena la lista de episodios en storage con un tiempo de expiración.
- */
-function saveDataToStorage(curData) {
-    var data = {
-        Data: curData,
-        ExpDate: setExpirationTime()
-    };
-
-    if (!getDataFromStorage()) localStorage.setItem(CACHE_KEY_EPISODES, JSON.stringify(data));
-}
-
-/**
- * Obtiene la lista de episodios desde storage.
- */
-function getDataFromStorage() {
-    let data = localStorage.getItem(CACHE_KEY_EPISODES);
-    
-    // No existen datos en storage.
-    if (!data) return null;
-
-    let parsedData = JSON.parse(data);
-
-    // En caso que existan datos en storage, debemos verificar el tiempo de expiración.
-    if (isDataOutdated(parsedData)) return null;
-
-    // Si todo esta Ok, devolvemos la data completa.
-    return parsedData.Data;
 }
