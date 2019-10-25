@@ -17,7 +17,7 @@ function init() {
     // Obtenemos toda la información desde el API
     getPodcastData().then((result) => {
         if (result == true) {
-            loadMainPage();
+            loadPage_main();
 
             initAudioPlayer();
 
@@ -30,94 +30,58 @@ function init() {
     registerPageEvents();
 }
 
-function loadEpisodesList() {
-    _mainContainer.html("");
-
-    let tpl_episode = "";
-    let episodeList = _podcastData.episodios;
-    let htmlCode = "<div class='container'><div class='row'>";
-
-    // Recorremos la lista de episodios
-    for (let i = 0; i < episodeList.length; i++) {
-        let curEpisode = episodeList[i];
-
-        tpl_episode = `
-            <div class='col-sm-6'>
-                <article class='card mb-3'>
-                    <img class='img-fluid' src='{{ episode_image_url }}' />
-                    <div class='card-body'>
-                        <h5 class='card-title'>{{ episode_title }}</h5>
-                        <p class='card-text'>{{ episode_description }}</p>
-                    </div>
-                </article>
-            </div>`;
-
-        let values = {
-            'episode_number': i + 1, 
-            'episode_image_url': curEpisode.imagen, 
-            'episode_title': curEpisode.nombre, 
-            'episode_description': curEpisode.descripcion,
-            'episode_uid': curEpisode.uid
-        };
-
-        for (var j in values) {
-            // Utilizamos una Regular Expression de manera tal que los placeholders
-            // puedan ser reemplazados a lo largo de todo el texto y no solamente la primera vez que se encuentre dicho valor
-            let re = new RegExp("{{ " + j + " }}", "ig");
-            tpl_episode = tpl_episode.replace(re, values[j]);
-        }
-
-        htmlCode += tpl_episode;
-    }
-
-    htmlCode += "</div></div>"
-
-    _mainContainer.append(htmlCode);
-}
-
 /**
  * Enlaza eventos a elementos HTML a lo largo del documento.
- * <p>
+ * 
  * Nota: Todos los eventos, como por ejemplo clicks, mouseover, etc. deberían registrarse acá
  * para mantener el orden.
- * </p>
  */
 function registerPageEvents() {
     
     // Eventos de click sobre todas las etiquetas "<a>"
     $(document).on("click", "a", function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        let curID = $(this).attr("data-id");
-
-        switch (curID.toLowerCase())
-        {
-            case "link_epilist":    // lista de episodios
-                loadEpisodesList();
-                break;
-
-            case "link_episode":    // detalle de episodio
-
-                break;
-
-            default:
-                loadMainPage();
-                break;
-        }
-
-        /*if (curID == "link_epiList") {
-            loadEpisodesList();
-        }
-        //else openLink($(this));
-        else loadMainPage();*/
-    })
+        onClickEventHandler_link($(this), event);
+    });
 }
 
-function openLink(linkElement) {
-    let linkDest = linkElement.attr("href");
+/**
+ * Controlador de evento de click sobre hipervinculos.
+ * @param {*} curElement Elemento clickeado disparador del evento.
+ * @param {*} event Evento de click disparado.
+ */
+function onClickEventHandler_link(curElement, event) {
+    event.preventDefault();
 
-    _mainContainer.load(linkDest);
+    let curID = curElement.attr("data-id");
+    let targetLink = curElement.attr("href");
+    let pageTitle = "Cadena de Datos";
+
+    switch (curID.toLowerCase())
+    {
+        case "link_epilist":    // lista de episodios
+            loadPage_episodeList();
+            break;
+
+        case "link_episode":    // Carga del episodio seleccionado.
+            let episodeUID = curElement.attr("data-uid");
+
+            let selectedEpisode = findEpisode_byUID(episodeUID);
+            pageTitle = selectedEpisode.nombre + " - " + pageTitle;
+            setPlayerMedia(createMediaObject(selectedEpisode));
+            break;
+
+        case "link_home":       // Carga de la home.
+        default:
+            loadPage_main();
+            break;
+    }
+
+    // Cambiamos la URL y SIN cambiar el estado, de esta manera no se va a poder utilizar el botón "Volver" del navegador.
+    // Si permitimos que se pueda utilizar el botón volver, se perderá cualquier episodio en reproducción.
+    window.history.replaceState({}, pageTitle, "/" + targetLink);
+    // Para actualizar el título correctamente debemos hacerlo de esta manera, debido a que
+    // replaceState (o pushState) ignora el parámetro del título.
+    document.title = pageTitle;
 }
 
 /**
@@ -160,53 +124,44 @@ function getPodcastData() {
 }
 
 /**
+ * Obtiene el último episodio de la lista.
+ */
+function getLastEpisode() {
+    return _podcastData.episodios[0];
+}
+
+/**
+ * Obtiene un episodio según su UID
+ * @param {string} uid UID del episodio.
+ */
+function findEpisode_byUID(uid) {
+    for (let i = 0; i < _podcastData.episodios.length; i++) {
+        let curEpisode = _podcastData.episodios[i];
+
+        if (curEpisode && curEpisode.uid == uid) {
+            return curEpisode;
+        }
+    }
+}
+
+/**
  * Inicializa la carga de la página.
  */
-function loadMainPage() {
+function loadPage_main() {
     let lastEpisode = getLastEpisode();
 
     _mainContainer.html("");
 
-    //$("#psp_main_title").html(_podcastData.nombre);
-    //$("#psp_main_subtitle").html(_podcastData.descripcion);
-
-    /*let tpl_episode = `<article class="episode">
-                <h2 class="episode__number">{{ episode_number }}</h2>
-                <div class="episode__media">
-                    <a href="episodio.html" class="episode__image" style="background-image: url({{ episode_image_url }});"></a>
-                </div>
-                <div class="episode__detail">
-                    <a href="episodio.html?uid={{ episode_uid }}" class="episode__title"><h4>{{ episode_title }}</h4></a>
-                    <!-- <p class="episode__description">{{ episode_description }}</p> -->
-                </div>
-                </article>`;*/
-
     let tpl_episode = `
         <div class='container'>
             <article class='card mb-3'>
-                <a class='img-fluid' data-id='link_episode' href='episodio/{{ episode_slug }}'><img class='img-fluid' src='{{ episode_image_url }}' /></a>
+                <a class='img-fluid' data-id='link_episode' data-uid='{{ episode_uid }}' href='episodio/{{ episode_slug }}'><img class='img-fluid' src='{{ episode_image_url }}' /></a>
                 <div class='card-body'>
-                    <h5 class='card-title'><a href='episodio/{{ episode_slug }}' data-id='link_episode'>{{ episode_title }}</a></h5>
+                    <h5 class='card-title'><a href='episodio/{{ episode_slug }}' data-id='link_episode' data-uid='{{ episode_uid }}'>{{ episode_title }}</a></h5>
                     <p class='card-text'>{{ episode_description }}</p>
                 </div>
             </article>
         </div>`;
-
-    /*$.each(lastEpisode, function(j, episodio){
-        let values = {
-            'episode_number': data.episodios.length - j, 
-            'episode_image_url': episodio.imagen, 
-            'episode_title': episodio.nombre, 
-            'episode_description': episodio.descripcion,
-            'episode_uid': episodio.uid
-        };
-        $article = tpl_episode;
-        for (var i in values) {
-            $article = $article.replace("{{ " + i + " }}", values[i])
-        }
-        
-        $("#episodes_section").append($article);
-    });*/
 
     let values = {
         'episode_number': _podcastData.episodios.length - 1, 
@@ -229,9 +184,49 @@ function loadMainPage() {
     _mainContainer.append($article);
 }
 
-/**
- * Obtiene el último episodio de la lista.
- */
-function getLastEpisode() {
-    return _podcastData.episodios[0];
+
+function loadPage_episodeList() {
+    _mainContainer.html("");
+
+    let tpl_episode = "";
+    let episodeList = _podcastData.episodios;
+    let htmlCode = "<div class='container'><div class='row'>";
+
+    // Recorremos la lista de episodios
+    for (let i = 0; i < episodeList.length; i++) {
+        let curEpisode = episodeList[i];
+
+        tpl_episode = `
+            <div class='col-sm-6'>
+                <article class='card mb-3'>
+                    <a class='img-fluid' data-id='link_episode' data-uid='{{ episode_uid }}' href='episodio/{{ episode_slug }}'><img class='img-fluid' src='{{ episode_image_url }}' /></a>
+                    <div class='card-body'>
+                        <h5 class='card-title'><a href='episodio/{{ episode_slug }}' data-id='link_episode' data-uid='{{ episode_uid }}'>{{ episode_title }}</a></h5>
+                        <p class='card-text'>{{ episode_description }}</p>
+                    </div>
+                </article>
+            </div>`;
+
+        let values = {
+            'episode_number': i + 1, 
+            'episode_image_url': curEpisode.imagen, 
+            'episode_title': curEpisode.nombre, 
+            'episode_description': curEpisode.descripcion,
+            'episode_uid': curEpisode.uid,
+            'episode_slug': curEpisode.slug
+        };
+
+        for (var j in values) {
+            // Utilizamos una Regular Expression de manera tal que los placeholders
+            // puedan ser reemplazados a lo largo de todo el texto y no solamente la primera vez que se encuentre dicho valor
+            let re = new RegExp("{{ " + j + " }}", "ig");
+            tpl_episode = tpl_episode.replace(re, values[j]);
+        }
+
+        htmlCode += tpl_episode;
+    }
+
+    htmlCode += "</div></div>"
+
+    _mainContainer.append(htmlCode);
 }
