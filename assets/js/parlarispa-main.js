@@ -15,7 +15,7 @@ function init() {
     // Obtenemos toda la información desde el API
     getPodcastData().then((result) => {
         if (result == true) {
-            loadPage_main();
+            //loadPage_main();
 
             initAudioPlayer();
 
@@ -49,9 +49,7 @@ function registerPageEvents() {
  */
 function onClickEventHandler_link(curElement, event) {
     event.preventDefault();
-    
-    let targetLink = curElement.attr("href");
-    openPage(targetLink);
+    openPage(curElement);
 }
 
 /**
@@ -109,6 +107,16 @@ function findEpisode_byUID(uid) {
         let curEpisode = _podcastData.episodios[i];
 
         if (curEpisode && curEpisode.uid == uid) {
+            return curEpisode;
+        }
+    }
+}
+
+function findEpisode_bySlug(slugText) {
+    for (let i = 0; i < _podcastData.episodios.length; i++) {
+        let curEpisode = _podcastData.episodios[i];
+
+        if (curEpisode && curEpisode.slug == slugText) {
             return curEpisode;
         }
     }
