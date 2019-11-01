@@ -36,16 +36,15 @@ function initRouter() {
 }
 
 function playMedia(episodeUID) {
-    // TODO: Añadir parseo de URLs para capturar el slug del episodio
-    // y buscar la data correspondiente de memoria.
-    //let episodeUID = eventSender.attr("data-uid");
-
     let selectedEpisode = findEpisode_byUID(episodeUID);
     //pageTitle = selectedEpisode.nombre + " - " + pageTitle;
     setPlayerMedia(createMediaObject(selectedEpisode));
 }
 
 function openPage(eventSender) {
+    // eventSender por lo general debe ser un link <a>. Cuando eventSender es null significa
+    // que se está accediendo a una página directamente a través de la URL por lo que leeremos
+    // la URL en cuestión directamente desde la barra de navegación.
     let requestedUrl = (eventSender) ? eventSender.attr("href") : window.location.href;
     let pageTitle = "";
     let found = false;
@@ -73,7 +72,7 @@ function openPage(eventSender) {
                 } // -- fin: for de posibles valores de parametros
             }
 
-            if (found) break;
+            if (found === true) break;
         } // -- fin: for de urls permitidas
     }
     else {
@@ -82,11 +81,10 @@ function openPage(eventSender) {
     }
 
     // Si no se encontró la página solicitada mostramos una página de error 404.
-    if (found === false) {
+    /*if (found === false) {
         //show404Page();
         loadPage_main();
-        //return;
-    }
+    }*/
 
     // Cambiamos la URL y SIN cambiar el estado, de esta manera no se va a poder utilizar el botón "Volver" del navegador.
     // Si permitimos que se pueda utilizar el botón volver, se perderá cualquier episodio en reproducción.
