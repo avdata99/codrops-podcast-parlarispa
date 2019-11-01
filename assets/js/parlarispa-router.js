@@ -171,7 +171,7 @@ function loadPage_episodeList() {
  * @param {*} eventSender Elemento disparador del evento.
  */
 function loadPage_episodeDetail(eventSender) {
-    $.get("/episodio.html", function(content) {
+    $.get("episodio.html", function(content) {
         let episodeUID; 
         let selectedEpisode;
 
