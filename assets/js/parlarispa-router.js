@@ -100,11 +100,11 @@ function loadPage_main() {
     let tpl_episode = `
         <div class='container'>
             <h2 class='mb-4'>Último episodio</h2>
-            <article class='card mx-auto mb-3 col-sm-6'>
+            <article class='card mx-auto p-0 mb-3 col-sm-6'>
                 <a data-id='link_episode' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'>
                     <img class='card-img-top episodeImg' src='{{ episode_image_url }}' />
                 </a>
-                <div class='card-body px-0 py-3'>
+                <div class='card-body p-4'>
                     <h5 class='card-title'><a href='index.html?p=episodio&id={{ episode_slug }}' data-id='link_episode' data-uid='{{ episode_uid }}'>{{ episode_title }}</a></h5>
                     <p class='card-text'>{{ episode_description }}</p>
                 </div>
@@ -133,7 +133,7 @@ function loadPage_main() {
 function loadPage_episodeList() {
     let tpl_episode = "";
     let episodeList = _podcastData.episodios;
-    let htmlCode = "<div class='container'><div class='row'>";
+    let htmlCode = "<div class='container epiList_cont'><h2 class='mb-4'>Lista de episodios</h2><div class='row'>";
 
     // Recorremos la lista de episodios
     for (let i = 0; i < episodeList.length; i++) {
@@ -142,7 +142,9 @@ function loadPage_episodeList() {
         tpl_episode = `
             <div class='col-sm-6'>
                 <article class='card mb-3'>
-                    <a class='img-fluid' data-id='link_episode' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'><img class='img-fluid' src='{{ episode_image_url }}' /></a>
+                    <a class='img-fluid' data-id='link_episode' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'>
+                        <img class='card-img-top episodeImg' src='{{ episode_image_url }}' />
+                    </a>
                     <div class='card-body'>
                         <h5 class='card-title'><a href='index.html?p=episodio&id={{ episode_slug }}' data-id='link_episode' data-uid='{{ episode_uid }}'>{{ episode_title }}</a></h5>
                         <p class='card-text'>{{ episode_description }}</p>

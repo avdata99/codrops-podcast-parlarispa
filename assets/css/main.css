@@ -1,11 +1,12 @@
 body {
-    padding: 90px 0 100px;
-}
-
-.navbar {
-    height: 70px;
+    padding: 120px 0 100px;
 }
 
 .episodeImg {
     height: 250px;
+}
+
+.epiList_cont .card-body {
+    height: 200px;
+    overflow: hidden;
 }
