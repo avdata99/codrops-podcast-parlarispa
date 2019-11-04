@@ -99,9 +99,12 @@ function loadPage_main() {
 
     let tpl_episode = `
         <div class='container'>
-            <article class='card mb-3'>
-                <a class='img-fluid' data-id='link_episode' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'><img class='img-fluid' src='{{ episode_image_url }}' /></a>
-                <div class='card-body'>
+            <h2 class='mb-4'>Último episodio</h2>
+            <article class='card mx-auto mb-3 col-sm-6'>
+                <a data-id='link_episode' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'>
+                    <img class='card-img-top episodeImg' src='{{ episode_image_url }}' />
+                </a>
+                <div class='card-body px-0 py-3'>
                     <h5 class='card-title'><a href='index.html?p=episodio&id={{ episode_slug }}' data-id='link_episode' data-uid='{{ episode_uid }}'>{{ episode_title }}</a></h5>
                     <p class='card-text'>{{ episode_description }}</p>
                 </div>

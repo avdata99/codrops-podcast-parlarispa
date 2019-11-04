@@ -6,8 +6,6 @@ var _podcastData = null;
 
 $(document).ready(function() {
     init();
-
-    initRouter();
 });
 
 /** Comienza todo el proceso de inicialización del sitio. */
@@ -15,14 +13,16 @@ function init() {
     // Obtenemos toda la información desde el API
     getPodcastData().then((result) => {
         if (result == true) {
-            //loadPage_main();
-
             initAudioPlayer();
 
             let lastEpisode = getLastEpisode();
 
             setPlayerMedia(createMediaObject(lastEpisode));
         }
+
+        // La inicialización del router debe hacerse luego de haber obtenido
+        // los datos de episodios.
+        initRouter();
     });
 
     registerPageEvents();

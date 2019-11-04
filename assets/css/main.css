@@ -1,5 +1,11 @@
 body {
-    padding: 120px 0 100px;
+    padding: 90px 0 100px;
 }
 
-/* Audio Player Container */
+.navbar {
+    height: 70px;
+}
+
+.episodeImg {
+    height: 250px;
+}
