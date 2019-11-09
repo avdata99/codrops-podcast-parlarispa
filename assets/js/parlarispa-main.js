@@ -48,8 +48,11 @@ function registerPageEvents() {
  * @param {*} event Evento de click disparado.
  */
 function onClickEventHandler_link(curElement, event) {
-    event.preventDefault();
-    openPage(curElement);
+    // Verificamos que el elemento no corresponda a los botones del carousel.
+    if (!curElement.attr("data-slide")) {
+        event.preventDefault();
+        openPage(curElement);
+    }
 }
 
 /**

@@ -3,10 +3,11 @@ body {
 }
 
 .episodeImg {
-    height: 250px;
+    height: 500px;
 }
 
-.epiList_cont .card-body {
+.epiList_cont {
     height: 200px;
     overflow: hidden;
+    /* background-color: #fff; */
 }
