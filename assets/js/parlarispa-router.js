@@ -37,7 +37,6 @@ function initRouter() {
 
 function playMedia(episodeUID) {
     let selectedEpisode = findEpisode_byUID(episodeUID);
-    //pageTitle = selectedEpisode.nombre + " - " + pageTitle;
     setPlayerMedia(createMediaObject(selectedEpisode));
 }
 
@@ -131,13 +130,10 @@ function openPage(eventSender) {
  * Inicializa la carga de la página principal.
  */
 function loadPage_main() {
-    //let lastEpisode = getLastEpisode();
     let episodeList = _podcastData.episodios;
-    let tpl_episode = "";
+    let tpl_episode = "", htmlCode = "";
 
-    let htmlCode = "<div id='epiCarousel' class='carousel slide carousel-fade' data-ride='carousel'>";
-
-    htmlCode += "<div class='carousel-inner'>";
+    htmlCode += "<div id='epiCarousel' class='carousel slide carousel-fade' data-ride='carousel'>";
 
     // Para añadir los indicadores del carousel debemos iterar por todos los episodios
     htmlCode += "<ol class='carousel-indicators'>"
@@ -147,23 +143,19 @@ function loadPage_main() {
     }
     htmlCode += "</ol>"
 
+    htmlCode += "<div class='carousel-inner'>";
+
     // Recorremos la lista de episodios
     for (let i = 0; i < episodeList.length; i++) {
         let curEpisode = episodeList[i];
         let activeClass = (i === 0) ? " active " : "";
-
         tpl_episode = `
             <div class='carousel-item` + activeClass + `' data-interval='2500'>
+                <img class='d-block w-100 episodeImg' src='{{ episode_image_url }}' />
                 <div class='carousel-caption'>
-                    <div class='card'>
-                        <img class='d-block w-100 episodeImg' src='{{ episode_image_url }}' />
-                        <div class='card-body'>
-                            <a data-id='link_episode' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'>
-                                <h5 class='card-title'><a href='index.html?p=episodio&id={{ episode_slug }}' data-id='link_episode' data-uid='{{ episode_uid }}'>{{ episode_title }}</a></h5>
-                            </a>
-                            <p class='card-text'>{{ episode_description }}</p>
-                        </div>
-                    </div>
+                    <a data-id='link_episode' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'>
+                        <h5 class='card-title'><a href='index.html?p=episodio&id={{ episode_slug }}' data-id='link_episode' data-uid='{{ episode_uid }}'>{{ episode_title }}</a></h5>
+                    </a>
                 </div>
             </div>`;
 
@@ -256,8 +248,6 @@ function loadPage_episodeDetail(eventSender) {
             selectedEpisode = findEpisode_bySlug(getParameterByName("id", window.location.href));
         }
 
-        setPlayerMedia(createMediaObject(selectedEpisode));
-
         let values = {
             'episode_image_url': selectedEpisode.imagen, 
             'episode_title': selectedEpisode.nombre, 
@@ -269,6 +259,14 @@ function loadPage_episodeDetail(eventSender) {
         setPageTitle(selectedEpisode.nombre + " - Cadena de datos");
 
         _mainContainer.html(replacePlaceholderValues(values,content));
+
+        // Inicializamos los tooltips.
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Registramos el evento correspondiente al botón de reproducción.
+        $(".playButton").click(function() {
+            setPlayerMedia(createMediaObject(selectedEpisode));
+        });
     });
 }
 
