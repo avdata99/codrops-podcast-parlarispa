@@ -37,7 +37,6 @@ function initRouter() {
 
 function playMedia(episodeUID) {
     let selectedEpisode = findEpisode_byUID(episodeUID);
-    //pageTitle = selectedEpisode.nombre + " - " + pageTitle;
     setPlayerMedia(createMediaObject(selectedEpisode));
 }
 
@@ -94,7 +93,7 @@ function openPage(eventSender) {
 /**
  * Inicializa la carga de la página principal.
  */
-function loadPage_main() {
+/*function loadPage_main() {
     let lastEpisode = getLastEpisode();
 
     let tpl_episode = `
@@ -123,6 +122,67 @@ function loadPage_main() {
     let article = tpl_episode;
             
     _mainContainer.html(replacePlaceholderValues(values, article));
+
+    setPageTitle("Cadena de datos");
+}*/
+
+/**
+ * Inicializa la carga de la página principal.
+ */
+function loadPage_main() {
+    let episodeList = _podcastData.episodios;
+    let tpl_episode = "", htmlCode = "";
+
+    htmlCode += "<div id='epiCarousel' class='carousel slide carousel-fade' data-ride='carousel'>";
+
+    // Para añadir los indicadores del carousel debemos iterar por todos los episodios
+    htmlCode += "<ol class='carousel-indicators'>"
+    for (let i = 0; i < episodeList.length; i++) {
+        let activeClass = (i === 0) ? " class='active' " : "";
+        htmlCode += "<li data-target='#epiCarousel' data-slide-to='" + i + "'" + activeClass + "></li>";
+    }
+    htmlCode += "</ol>"
+
+    htmlCode += "<div class='carousel-inner'>";
+
+    // Recorremos la lista de episodios
+    for (let i = 0; i < episodeList.length; i++) {
+        let curEpisode = episodeList[i];
+        let activeClass = (i === 0) ? " active " : "";
+        tpl_episode = `
+            <div class='carousel-item` + activeClass + `' data-interval='2500'>
+                <img class='d-block w-100 episodeImg' src='{{ episode_image_url }}' />
+                <div class='carousel-caption'>
+                    <a data-id='link_episode' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'>
+                        <h5 class='card-title'><a href='index.html?p=episodio&id={{ episode_slug }}' data-id='link_episode' data-uid='{{ episode_uid }}'>{{ episode_title }}</a></h5>
+                    </a>
+                </div>
+            </div>`;
+
+        let values = {
+            'episode_number': _podcastData.episodios.length - 1, 
+            'episode_image_url': curEpisode.imagen, 
+            'episode_title': curEpisode.nombre, 
+            'episode_description': curEpisode.descripcion,
+            'episode_uid': curEpisode.uid,
+            'episode_slug': curEpisode.slug
+        };
+                        
+        htmlCode += replacePlaceholderValues(values, tpl_episode);
+    }
+
+    htmlCode += `</div>
+        <a class='carousel-control-prev' href='#epiCarousel' role='button' data-slide='prev'>
+            <span class='carousel-control-prev-icon' aria-hidden='true'></span>
+            <span class='sr-only'>Anterior</span>
+        </a>
+        <a class='carousel-control-next' href='#epiCarousel' role='button' data-slide='next'>
+            <span class='carousel-control-next-icon' aria-hidden='true'></span>
+            <span class='sr-only'>Siguiente</span>
+        </a>
+    </div>`;
+            
+    _mainContainer.html(htmlCode);
 
     setPageTitle("Cadena de datos");
 }
@@ -188,8 +248,6 @@ function loadPage_episodeDetail(eventSender) {
             selectedEpisode = findEpisode_bySlug(getParameterByName("id", window.location.href));
         }
 
-        setPlayerMedia(createMediaObject(selectedEpisode));
-
         let values = {
             'episode_image_url': selectedEpisode.imagen, 
             'episode_title': selectedEpisode.nombre, 
@@ -201,6 +259,14 @@ function loadPage_episodeDetail(eventSender) {
         setPageTitle(selectedEpisode.nombre + " - Cadena de datos");
 
         _mainContainer.html(replacePlaceholderValues(values,content));
+
+        // Inicializamos los tooltips.
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Registramos el evento correspondiente al botón de reproducción.
+        $(".playButton").click(function() {
+            setPlayerMedia(createMediaObject(selectedEpisode));
+        });
     });
 }
 
