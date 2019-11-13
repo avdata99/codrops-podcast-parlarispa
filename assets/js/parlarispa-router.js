@@ -50,7 +50,7 @@ function openPage(eventSender) {
     let pageParam = getParameterByName("p", requestedUrl);
 
     // Limpiamos el contenedor
-    _mainContainer.html("");
+    clearContainer();
 
     // Verificamos que la URL solicitada sea válida
     if (pageParam) {
@@ -153,8 +153,8 @@ function loadPage_main() {
             <div class='carousel-item` + activeClass + `' data-interval='2500'>
                 <img class='d-block w-100 episodeImg' src='{{ episode_image_url }}' />
                 <div class='carousel-caption'>
-                    <a data-id='link_episode' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'>
-                        <h5 class='card-title'><a href='index.html?p=episodio&id={{ episode_slug }}' data-id='link_episode' data-uid='{{ episode_uid }}'>{{ episode_title }}</a></h5>
+                    <a data-id='link_episode' data-type='self' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'>
+                        <h5 class='card-title'><a href='index.html?p=episodio&id={{ episode_slug }}' data-id='link_episode' data-uid='{{ episode_uid }}' data-type='self'>{{ episode_title }}</a></h5>
                     </a>
                 </div>
             </div>`;
@@ -183,6 +183,7 @@ function loadPage_main() {
     </div>`;
             
     _mainContainer.html(htmlCode);
+    _mainContainer.fadeIn(250);
 
     setPageTitle("Cadena de datos");
 }
@@ -202,11 +203,11 @@ function loadPage_episodeList() {
         tpl_episode = `
             <div class='col-sm-6'>
                 <article class='card mb-3'>
-                    <a class='img-fluid' data-id='link_episode' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'>
+                    <a class='img-fluid' data-type='self' data-id='link_episode' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'>
                         <img class='card-img-top episodeImg' src='{{ episode_image_url }}' />
                     </a>
                     <div class='card-body'>
-                        <h5 class='card-title'><a href='index.html?p=episodio&id={{ episode_slug }}' data-id='link_episode' data-uid='{{ episode_uid }}'>{{ episode_title }}</a></h5>
+                        <h5 class='card-title'><a href='index.html?p=episodio&id={{ episode_slug }}' data-type='self' data-id='link_episode' data-uid='{{ episode_uid }}'>{{ episode_title }}</a></h5>
                         <p class='card-text'>{{ episode_description }}</p>
                     </div>
                 </article>
@@ -227,6 +228,7 @@ function loadPage_episodeList() {
     htmlCode += "</div></div>"
 
     _mainContainer.html(htmlCode);
+    _mainContainer.fadeIn(250);
 
     setPageTitle("Listado de episodios - Cadena de datos");
 }
@@ -259,6 +261,7 @@ function loadPage_episodeDetail(eventSender) {
         setPageTitle(selectedEpisode.nombre + " - Cadena de datos");
 
         _mainContainer.html(replacePlaceholderValues(values,content));
+        _mainContainer.fadeIn(250);
 
         // Inicializamos los tooltips.
         $('[data-toggle="tooltip"]').tooltip();
@@ -284,4 +287,11 @@ function setPageTitle(titleText) {
     // Para actualizar el título correctamente debemos hacerlo de esta manera, debido a que
     // replaceState (o pushState) ignora el parámetro del título.
     document.title = titleText;
+}
+
+function clearContainer() {
+    _mainContainer.fadeOut(150);
+/*     setTimeout(function() {
+        //_mainContainer.html("");
+    }, 260); */
 }

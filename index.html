@@ -21,9 +21,17 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse bg-dark" id="navbarToggler">
-          <div class="navbar-nav">
-            <a class="nav-item nav-link" href="index.html">Home</a>
-            <a class="nav-item nav-link" href="index.html?p=episodios">Episodios</a>
+          <div class="navbar-nav" id="naviBar">
+            <a class="nav-item nav-link" data-type="self" href="index.html">Home</a>
+            <a class="nav-item nav-link" data-type="self" href="index.html?p=episodios">Episodios</a>
+            <div class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="platDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Suscríbete
+              </a>
+              <div id="platDDMenu" class="dropdown-menu" aria-labelledby="platDropdown">
+
+              </div>
+            </div>
           </div>
         </div>
       </nav>
