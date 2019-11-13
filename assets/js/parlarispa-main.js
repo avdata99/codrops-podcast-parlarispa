@@ -23,9 +23,26 @@ function init() {
         // La inicialización del router debe hacerse luego de haber obtenido
         // los datos de episodios.
         initRouter();
+
+        fillPlataformasMenu();
     });
 
     registerPageEvents();
+}
+
+/**
+ * Rellena el dropdown de las plataformas según lo obtenido desde el API.
+ */
+function fillPlataformasMenu() {
+    let dropdownMenu = $("#platDDMenu");
+
+    for (let i = 0; i < _podcastData.plataformas.length; i++) {
+        let curPlat = _podcastData.plataformas[i];
+
+        let htmlCode = "<a class='dropdown-item' href='" + curPlat.url + "' target='_blank'>" + curPlat.plataforma.nombre + "</a>";
+
+        dropdownMenu.append(htmlCode);
+    }
 }
 
 /**
@@ -49,7 +66,8 @@ function registerPageEvents() {
  */
 function onClickEventHandler_link(curElement, event) {
     // Verificamos que el elemento no corresponda a los botones del carousel.
-    if (!curElement.attr("data-slide")) {
+    //if (!curElement.attr("data-slide")) {
+    if (curElement.attr("data-type") === "self") {
         event.preventDefault();
         openPage(curElement);
     }

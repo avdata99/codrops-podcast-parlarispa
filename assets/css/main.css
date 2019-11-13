@@ -40,3 +40,12 @@ body {
     color: #1e90ff;
     cursor: pointer;
 }
+
+/* Fix temporal: hace que el dropdown de la barra de menu pueda ser scrolleable cuando la barra
+de navegacion se colapsa. */
+@media (max-width: 991px) {
+    .navbar {
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+}
