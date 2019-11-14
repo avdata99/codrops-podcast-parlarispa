@@ -23,12 +23,22 @@ body {
 }
 
 .carousel-item .episodeImg {
-    height: 700px;
+    height: 500px;
     position: relative;
+    object-fit: cover;
+    object-position: 100% 40%;
 }
 
 .episodeImg {
-    height: 400px;    
+    height: 350px;    
+    object-fit: cover;
+    object-position: 100% 20%;
+}
+
+.epiDetail {
+    height: 400px;
+    object-fit: cover;
+    object-position: 100% 50%;
 }
 
 .epiList_cont .card-body {
