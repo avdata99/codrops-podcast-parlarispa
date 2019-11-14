@@ -26,7 +26,7 @@ body {
     height: 500px;
     position: relative;
     object-fit: cover;
-    object-position: 100% 40%;
+    object-position: 50% 40%;
 }
 
 .episodeImg {
