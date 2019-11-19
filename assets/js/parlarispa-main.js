@@ -25,6 +25,9 @@ function init() {
         initRouter();
 
         fillPlataformasMenu();
+
+        // Nos aseguramos de inicializar el carousel
+        $(".carousel").carousel();
     });
 
     registerPageEvents();
