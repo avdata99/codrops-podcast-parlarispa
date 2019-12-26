@@ -141,7 +141,7 @@ function loadPage_main() {
         let activeClass = (i === 0) ? " class='active' " : "";
         htmlCode += "<li data-target='#epiCarousel' data-slide-to='" + i + "'" + activeClass + "></li>";
     }
-    htmlCode += "</ol>"
+    htmlCode += "</ol>";
 
     htmlCode += "<div class='carousel-inner'>";
 
@@ -150,7 +150,11 @@ function loadPage_main() {
         let curEpisode = episodeList[i];
         let activeClass = (i === 0) ? " active " : "";
         tpl_episode = `
-            <div class='carousel-item` + activeClass + `' data-interval='2500'>
+            <div class='carousel-item` + activeClass + `' data-interval='25000000'>
+                <div class='pb_cont'>
+                    <span class='playButton' data-uid='{{ episode_uid }}' data-toggle='tooltip' title='Reproducir episodio'><i class="fas fa-play fa-6x"></i></span>
+                    <span class='pauseButton' data-toggle='tooltip' title='Pausar'><i class="fas fa-pause fa-6x"></i></span>
+                </div>
                 <img class='d-block w-100 episodeImg' src='{{ episode_image_url }}' />
                 <div class='carousel-caption'>
                     <a data-id='link_episode' data-type='self' data-uid='{{ episode_uid }}' href='index.html?p=episodio&id={{ episode_slug }}'>
@@ -184,6 +188,41 @@ function loadPage_main() {
             
     _mainContainer.html(htmlCode);
     _mainContainer.fadeIn(250);
+
+    // Inicializamos los tooltips.
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // Registramos el evento correspondiente al botón de reproducción.
+    $(".playButton").click(function() {
+        let episodeUID; 
+        let selectedEpisode;
+        let curEl = $(this);
+        let pauseButton = curEl.parents(".pb_cont").find(".pauseButton");
+
+        episodeUID = curEl.attr("data-uid");
+        selectedEpisode = findEpisode_byUID(episodeUID);
+
+        setPlayerMedia(createMediaObject(selectedEpisode));
+        playerStart();
+
+        // Reseteamos la visibilidad de todos los botones.
+        $(".pauseButton").hide();
+        $(".playButton").show();
+
+        // Ocultamos el botón de reproducir y mostramos el de pausa
+        curEl.hide();
+        pauseButton.show();
+    });
+
+    $(".pb_cont .pauseButton").click(function() {
+        let curEl = $(this);
+        let playButton = curEl.parents(".pb_cont").find(".playButton");
+
+        curEl.hide();
+        playButton.show();
+        
+        playerPause();
+    })
 
     setPageTitle("Cadena de datos");
 }

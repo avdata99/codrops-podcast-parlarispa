@@ -40,3 +40,11 @@ function initAudioPlayer() {
         toggleDuration: true
     });
 }
+
+function playerStart() {
+    _audioPlayer.jPlayer("play");
+}
+
+function playerPause() {
+    _audioPlayer.jPlayer("pause");
+}

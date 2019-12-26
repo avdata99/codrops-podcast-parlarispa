@@ -69,7 +69,6 @@ function registerPageEvents() {
  */
 function onClickEventHandler_link(curElement, event) {
     // Verificamos que el elemento no corresponda a los botones del carousel.
-    //if (!curElement.attr("data-slide")) {
     if (curElement.attr("data-type") === "self") {
         event.preventDefault();
         openPage(curElement);

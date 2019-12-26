@@ -29,6 +29,10 @@ body {
     object-position: 50% 40%;
 }
 
+.carousel-item:hover .pb_cont {
+    opacity: 1;
+}
+
 .episodeImg {
     height: 350px;    
     object-fit: cover;
@@ -44,6 +48,27 @@ body {
 .epiList_cont .card-body {
     height: 250px;
     overflow: hidden;
+}
+
+/* Corresponde al contenedor del botón "play" de la Home */
+.pb_cont {
+    position: absolute;
+    z-index: 2;
+    margin: 20px 0;
+    width: 100%;
+    text-align: center;
+    opacity: 0.85;
+    transition: opacity linear 0.15s;
+}
+
+.pb_cont .playButton, .pb_cont .pauseButton {
+    color: #fff;
+    display: block;
+    cursor: pointer;
+}
+
+.pb_cont .pauseButton {
+    display: none;
 }
 
 .playButton {
