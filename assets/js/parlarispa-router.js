@@ -132,6 +132,7 @@ function openPage(eventSender) {
 function loadPage_main() {
     let episodeList = _podcastData.episodios;
     let tpl_episode = "", htmlCode = "";
+    let selectedEpisode = null;
 
     htmlCode += "<div id='epiCarousel' class='carousel slide carousel-fade' data-ride='carousel'>";
 
@@ -150,7 +151,7 @@ function loadPage_main() {
         let curEpisode = episodeList[i];
         let activeClass = (i === 0) ? " active " : "";
         tpl_episode = `
-            <div class='carousel-item` + activeClass + `' data-interval='25000000'>
+            <div class='carousel-item` + activeClass + `' data-interval='2500'>
                 <div class='pb_cont'>
                     <span class='playButton' data-uid='{{ episode_uid }}' data-toggle='tooltip' title='Reproducir episodio'><i class="fas fa-play fa-6x"></i></span>
                     <span class='pauseButton' data-toggle='tooltip' title='Pausar'><i class="fas fa-pause fa-6x"></i></span>
@@ -195,19 +196,23 @@ function loadPage_main() {
     // Registramos el evento correspondiente al botón de reproducción.
     $(".playButton").click(function() {
         let episodeUID; 
-        let selectedEpisode;
         let curEl = $(this);
         let pauseButton = curEl.parents(".pb_cont").find(".pauseButton");
 
         episodeUID = curEl.attr("data-uid");
         selectedEpisode = findEpisode_byUID(episodeUID);
 
-        setPlayerMedia(createMediaObject(selectedEpisode));
-        playerStart();
+        // Si el episodio seleccionado no es el mismo que está en reproducción
+        // reproducimos el audio desde el inicio.
+        if (_currentEpisodeID !== episodeUID) {
+            _episodeCurrentTime = 0;
+            _currentEpisodeID = episodeUID;
+        }
 
-        // Reseteamos la visibilidad de todos los botones.
-        $(".pauseButton").hide();
-        $(".playButton").show();
+        setPlayerMedia(createMediaObject(selectedEpisode));
+        playerStart(_episodeCurrentTime);
+
+        resetButtonStatus();
 
         // Ocultamos el botón de reproducir y mostramos el de pausa
         curEl.hide();
@@ -220,11 +225,45 @@ function loadPage_main() {
 
         curEl.hide();
         playButton.show();
+        _episodeCurrentTime = _audioPlayer.data("jPlayer").status.currentTime;
         
         playerPause();
     })
 
+    // Escuchamos por eventos de pausa y reproducción del reproductor
+    //if (_episodeCurrentTime !== 0) {
+        player_bindEvent("pause", function(e) {
+            //console.log(e);
+            resetButtonStatus();
+        });
+    //}
+
+    //if (_episodeCurrentTime !== 0) {
+        player_bindEvent("play", function(e) {
+            if (selectedEpisode) {
+                let episodeID = selectedEpisode.uid;
+                let mainCont = $(".playButton[data-uid='" + episodeID + "']").parent(".pb_cont");
+
+                mainCont.find(".playButton").hide();
+                mainCont.find(".pauseButton").show();
+
+            }
+        });
+    //}
+    
     setPageTitle("Cadena de datos");
+}
+
+var _episodeCurrentTime = 0;
+var _currentEpisodeID = "";
+
+/**
+ * Resetea el estado de los botones de play / pausa, ocultando el de pausa y mostrando el de play.
+ */
+function resetButtonStatus() {
+    // Reseteamos la visibilidad de todos los botones.
+    $(".pauseButton").hide();
+    $(".playButton").show();
 }
 
 /**

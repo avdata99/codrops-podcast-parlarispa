@@ -41,10 +41,20 @@ function initAudioPlayer() {
     });
 }
 
-function playerStart() {
-    _audioPlayer.jPlayer("play");
+function playerStart(time) {
+    _audioPlayer.jPlayer("play", time);
 }
 
-function playerPause() {
-    _audioPlayer.jPlayer("pause");
+function playerPause() { _audioPlayer.jPlayer("pause"); }
+
+function player_bindEvent(eventName, callback) {
+    //_audioPlayer.jPlayer({eventName: callback});
+    switch (eventName.toLowerCase()) {
+        case "play":
+            _audioPlayer.bind($.jPlayer.event.play, callback);
+            break;
+        case "pause":
+            _audioPlayer.bind($.jPlayer.event.pause, callback);
+            break;
+    }
 }
