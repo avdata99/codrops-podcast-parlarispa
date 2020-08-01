@@ -1,31 +1,9 @@
 # Template de ejemplo para Parlarispa
 
-Basado en [Dropcast](dropcast.md).  
-La plataforma de podcasts _Parlarispa_ procesa audios y entrega APIs simples con datos sobre podcasts y sus episodios.  
+Template basado en [Dropcast](dropcast.md).  
 
-Este repositorio es un prototipo de aplicación web que consume esos datos, los muestra y permite reproducir los audios.  
+La plataforma de podcasts [Parlarispa](https://parlarispa.com/) (backend) procesa audios y entrega APIs simples con datos sobre podcasts y sus episodios. La idea es poder disponer de una versión web+app de todos los podcast alojados en la plataforma. 
 
-Se hizo con la finalidad de mostrar el producto final buscado.
+Este repositorio es un prototipo de aplicación web que consume esos datos, los muestra y permite reproducir los audios. Cambiando [el ID del podcast](https://github.com/avdata99/codrops-podcast-parlarispa/blob/master/assets/js/parlarispa-main.js#L2) esta app debería poder servir para cualquier otro podcast de la misma plataforma.
 
-## Requerimientos
-
-### Generales
-
-Lineamientos:
- - Definir que librerías / framewors se van a usar. Evitar propuestas muy complejas. El producto es simple.
- - Que el producto final sea simple de entender y modificar. El producto actual es muy simple, esta simpleza se debe mantener.
-  - Responsivo/Mobile first.
-  - El producto final será libre y algunos clientes lo usarán como base para crear sus propios sitios. Debe estar pensado para que otros desarrolladores accedan rápido a comprender como funciona.
-
-### Particulares
-
-Tickets:
- - Que el sitio web no se refresque completamente al hacer click y moverse entre secciones.
- - Si un audio se está reproduciendo no debe cortarse porque el usuario se mueva a otra sección.
- - Tener un control de volumen disponible.
- - Adaptar el template (o proponer otro) para que funcione perfecto en mobile. Hoy tiene algunos detalles a corregir.
- - URL únicas para cada episodio/recurso interno. Al moverse el usuario la URL deberá cambiar y esta deberá ser válida para volver al recurso.
- - Definir una forma de mostrar los links a otras plataformas de podcasts (ya está en el API pero no en la web).
- - Permitir navegar entre los episodios (sin que se corte el audio) simplemente arrastrando para derecha e izquierda (anterior/siguiente) 
-
-
+Todos los datos a exponer en esta aplicacion [se encuentran en APIs](https://parlarispa.com/api/v1/podcasts/podcast/aa2b715c-73aa-412a-9e04-100f60881ffa/) que ya están funcionando en el backend.
