@@ -7,3 +7,5 @@ La plataforma de podcasts [Parlarispa](https://parlarispa.com/) (backend) proces
 Este repositorio es un prototipo de aplicación web que consume esos datos, los muestra y permite reproducir los audios. Cambiando [el ID del podcast](https://github.com/avdata99/codrops-podcast-parlarispa/blob/master/assets/js/parlarispa-main.js#L2) esta app debería poder servir para cualquier otro podcast de la misma plataforma.
 
 Todos los datos a exponer en esta aplicacion [se encuentran en APIs](https://parlarispa.com/api/v1/podcasts/podcast/aa2b715c-73aa-412a-9e04-100f60881ffa/) que ya están funcionando en el backend.
+
+Los lineamientos generales estan definidos en [este documento](docs/requerimientos.md).
